@@ -30,7 +30,11 @@ export class NewrelicRubyLambdaDemoStack extends cdk.Stack {
       NEW_RELIC_EXTENSION_LOGS_ENABLED: 'true',
       NEW_RELIC_EXTENSION_LOG_LEVEL: 'trace',
       NEW_RELIC_LOG_ENDPOINT: 'https://log-api.newrelic.com/log/v1',
-      NEW_RELIC_TELEMETRY_ENDPOINT: 'https://cloud-collector.newrelic.com/aws/lambda/v1',      
+      NEW_RELIC_TELEMETRY_ENDPOINT: 'https://cloud-collector.newrelic.com/aws/lambda/v1',
+
+      // Reporting logs to new relic
+      NEW_RELIC_EXTENSION_SEND_FUNCTION_LOGS: 'true',
+      NEW_RELIC_LOG_LEVEL: 'info', // debug, info, warn, error, fatal
     }
 
     // Build our custom lambda layer 
@@ -77,15 +81,6 @@ export class NewrelicRubyLambdaDemoStack extends cdk.Stack {
     });
 
     // Modular lambda function w/ custom gem path
-    // {
-    //   "errorMessage": "Failed to prep the Lambda function to be wrapped - Path '/var/task/app/handlers/modular_hello_world.Handlers::HelloWorld.rb' does not exist or is not readable",
-    //   "errorType": "Function<RuntimeError>",
-    //   "stackTrace": [
-    //     "/opt/ruby/lib/newrelic_lambda_wrapper.rb:42:in `rescue in method_name'",
-    //     "/opt/ruby/lib/newrelic_lambda_wrapper.rb:31:in `method_name'",
-    //     "/opt/ruby/lib/newrelic_lambda_wrapper.rb:46:in `handler'"
-    //   ]
-    // }
     new Function(this, 'RubyLambdaModularHelloWorld', {
       functionName: 'ruby-lambda-modular-world',
       runtime: Runtime.RUBY_3_2,
