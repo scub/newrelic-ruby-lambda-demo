@@ -59,11 +59,14 @@ export class NewrelicRubyLambdaDemoStack extends cdk.Stack {
       }),
     });
 
-    // Source the newrelic gem layer
-    const newrelicGemLayer = new LayerVersion(this, 'NewrelicGemLayer', {
-      layerVersionName: 'newrelic-ruby-lambda-layer',
-      code: Code.fromAsset('build_resources/ruby32.x86_64.zip')
-    });
+    // Source the newrelic gem layer from the zip
+    // const newrelicGemLayer = new LayerVersion(this, 'NewrelicGemLayer', {
+    //   layerVersionName: 'newrelic-ruby-lambda-layer',
+    //   code: Code.fromAsset('build_resources/ruby32.x86_64.zip')
+    // });
+
+    // Source the newrelic gem layer directly from upstream
+    const newrelicGemLayer = LayerVersion.fromLayerVersionArn(this, 'NewrelicGemLayer', 'arn:aws:lambda:us-east-1:451483290750:layer:NewRelicRuby32:1')
 
     // Basic lambda function w/ custom gem path
     new Function(this, 'RubyLambdaHelloWorld', {
