@@ -2,8 +2,10 @@
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { Code, LayerVersion, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
+import { Code, LayerVersion, Function, Runtime, ParamsAndSecretsLayerVersion, ParamsAndSecretsVersions } from 'aws-cdk-lib/aws-lambda';
 import { BundlingFileAccess, DockerImage, Duration } from 'aws-cdk-lib';
+import { StringParameter } from 'aws-cdk-lib/aws-ssm';
+import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 
 export class NewrelicRubyLambdaDemoStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -17,16 +19,25 @@ export class NewrelicRubyLambdaDemoStack extends cdk.Stack {
       'cdk.out',
     ]
 
+    // Sourcing values from SecretsManager
+    const newrelic_secret = Secret.fromSecretNameV2(this, 'NewRelicSecret', '/standard/new_relic_keys')
+    const newrelic_license_key = newrelic_secret.secretValueFromJson('NEW_RELIC_LICENSE_KEY').unsafeUnwrap()
+    const newrelic_account_id  = newrelic_secret.secretValueFromJson('NEW_RELIC_ACCOUNT_ID').unsafeUnwrap()
+
+    // Sourcing values from ssm
+    // const newrelic_license_key = StringParameter.valueFromLookup(this, '/standard/NEW_RELIC_LICENSE_KEY')
+    // const newrelic_account_id  = StringParameter.valueFromLookup(this, '/standard/NEW_RELIC_ACCOUNT_ID')
+
     const environment = {
       // this env var is the path to the ruby gems layer
       GEM_PATH: '/opt/ruby/3.2.0',
 
       // see https://github.com/rubygems/rubygems/issues/5893
       BUNDLE_FROZEN: 'true',
-      
+
       // set any new relic environment variables here
-      NEW_RELIC_ACCOUNT_ID: '00000',
-      NEW_RELIC_LICENSE_KEY: '0000000000000000000000000000000',
+      NEW_RELIC_ACCOUNT_ID: newrelic_account_id,
+      NEW_RELIC_LICENSE_KEY: newrelic_license_key,
       NEW_RELIC_EXTENSION_LOGS_ENABLED: 'true',
       NEW_RELIC_EXTENSION_LOG_LEVEL: 'trace',
       NEW_RELIC_LOG_ENDPOINT: 'https://log-api.newrelic.com/log/v1',
@@ -34,7 +45,7 @@ export class NewrelicRubyLambdaDemoStack extends cdk.Stack {
 
       // Reporting logs to new relic
       NEW_RELIC_EXTENSION_SEND_FUNCTION_LOGS: 'true',
-      NEW_RELIC_LOG_LEVEL: 'info', // debug, info, warn, error, fatal
+      NEW_RELIC_LOG_LEVEL: 'debug', //'info', // debug, info, warn, error, fatal
     }
 
     // Build our custom lambda layer 
