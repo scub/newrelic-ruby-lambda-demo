@@ -2,6 +2,10 @@
 
 This demo uses the AWS CDK to deploy a Ruby based Lambda which relies on a custom gem path.
 
+## Important Links
+
+- [List of New Relic Layers](https://layers.newrelic-external.com/)
+
 ## Getting Started
 
 Before proceeding update the values for `NEW_RELIC_ACCOUNT_ID` and `NEW_RELIC_LICENSE_KEY` in the deployment configuration [build_resources/newrelic-ruby-lambda-demo.ts](./build_resources/newrelic-ruby-lambda-demo.ts#L28-L29)

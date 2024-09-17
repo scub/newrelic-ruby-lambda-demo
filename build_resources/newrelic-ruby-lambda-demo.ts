@@ -77,6 +77,7 @@ export class NewrelicRubyLambdaDemoStack extends cdk.Stack {
     // });
 
     // Source the newrelic gem layer directly from upstream
+    // https://layers.newrelic-external.com/
     const newrelicGemLayer = LayerVersion.fromLayerVersionArn(this, 'NewrelicGemLayer', 'arn:aws:lambda:us-east-1:451483290750:layer:NewRelicRuby32:1')
 
     // Basic lambda function w/ custom gem path
