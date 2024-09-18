@@ -19,10 +19,14 @@ export class NewrelicRubyLambdaDemoStack extends cdk.Stack {
       'cdk.out',
     ]
 
+    // Hardcoding
+    const newrelic_account_id  = '00000'
+    const newrelic_license_key = '0000000000000000000000000000000'
+
     // Sourcing values from SecretsManager
-    const newrelic_secret = Secret.fromSecretNameV2(this, 'NewRelicSecret', '/standard/new_relic_keys')
-    const newrelic_license_key = newrelic_secret.secretValueFromJson('NEW_RELIC_LICENSE_KEY').unsafeUnwrap()
-    const newrelic_account_id  = newrelic_secret.secretValueFromJson('NEW_RELIC_ACCOUNT_ID').unsafeUnwrap()
+    // const newrelic_secret = Secret.fromSecretNameV2(this, 'NewRelicSecret', '/standard/new_relic_keys')
+    // const newrelic_license_key = newrelic_secret.secretValueFromJson('NEW_RELIC_LICENSE_KEY').unsafeUnwrap()
+    // const newrelic_account_id  = newrelic_secret.secretValueFromJson('NEW_RELIC_ACCOUNT_ID').unsafeUnwrap()
 
     // Sourcing values from ssm
     // const newrelic_license_key = StringParameter.valueFromLookup(this, '/standard/NEW_RELIC_LICENSE_KEY')
@@ -78,7 +82,7 @@ export class NewrelicRubyLambdaDemoStack extends cdk.Stack {
 
     // Source the newrelic gem layer directly from upstream
     // https://layers.newrelic-external.com/
-    const newrelicGemLayer = LayerVersion.fromLayerVersionArn(this, 'NewrelicGemLayer', 'arn:aws:lambda:us-east-1:451483290750:layer:NewRelicRuby32:1')
+    const newrelicGemLayer = LayerVersion.fromLayerVersionArn(this, 'NewrelicGemLayer', 'arn:aws:lambda:us-east-1:451483290750:layer:NewRelicRuby32:7')
 
     // Basic lambda function w/ custom gem path
     new Function(this, 'RubyLambdaHelloWorld', {
