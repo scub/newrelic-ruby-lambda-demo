@@ -52,7 +52,9 @@ export class NewrelicRubyLambdaDemoStack extends cdk.Stack {
       NEW_RELIC_LOG_LEVEL: 'debug', //'info', // debug, info, warn, error, fatal
     }
 
-    // Build our custom lambda layer 
+    let STAGE = process.env.STAGE ? process.env.STAGE : 'test'
+
+    // Build our custom lambda layer
     const gemLayer = new LayerVersion(this, 'GemLayer', {
       layerVersionName: `custom-ruby-gems`,
       code: Code.fromAsset('.', {
@@ -75,18 +77,18 @@ export class NewrelicRubyLambdaDemoStack extends cdk.Stack {
     });
 
     // Source the newrelic gem layer from the zip
-    // const newrelicGemLayer = new LayerVersion(this, 'NewrelicGemLayer', {
-    //   layerVersionName: 'newrelic-ruby-lambda-layer',
-    //   code: Code.fromAsset('build_resources/ruby32.x86_64.zip')
-    // });
+    const newrelicGemLayer = new LayerVersion(this, 'NewrelicGemLayer', {
+      layerVersionName: 'newrelic-ruby-lambda-layer',
+      code: Code.fromAsset('build_resources/ruby32.x86_64.zip')
+    });
 
     // Source the newrelic gem layer directly from upstream
     // https://layers.newrelic-external.com/
-    const newrelicGemLayer = LayerVersion.fromLayerVersionArn(this, 'NewrelicGemLayer', 'arn:aws:lambda:us-east-1:451483290750:layer:NewRelicRuby32:7')
+    // const newrelicGemLayer = LayerVersion.fromLayerVersionArn(this, 'NewrelicGemLayer', 'arn:aws:lambda:us-east-1:451483290750:layer:NewRelicRuby32:11')
 
     // Basic lambda function w/ custom gem path
     new Function(this, 'RubyLambdaHelloWorld', {
-      functionName: 'ruby-lambda-hello-world',
+      functionName: `ruby-lambda-hello-world-${STAGE}`,
       runtime: Runtime.RUBY_3_2,
       code: Code.fromAsset('./', { exclude: exclude }),
       handler: 'newrelic_lambda_wrapper.handler',
@@ -101,7 +103,7 @@ export class NewrelicRubyLambdaDemoStack extends cdk.Stack {
 
     // Modular lambda function w/ custom gem path
     new Function(this, 'RubyLambdaModularHelloWorld', {
-      functionName: 'ruby-lambda-modular-world',
+      functionName: `ruby-lambda-modular-world-${STAGE}`,
       runtime: Runtime.RUBY_3_2,
       code: Code.fromAsset('./', { exclude: exclude }),
       handler: 'newrelic_lambda_wrapper.handler',
@@ -116,7 +118,7 @@ export class NewrelicRubyLambdaDemoStack extends cdk.Stack {
 
     // Raising an exception from a lambda function causes forces request to timeout
     new Function(this, 'RubyLambdaRaiseException', {
-      functionName: 'ruby-lambda-raise-exception',
+      functionName: `ruby-lambda-raise-exception-${STAGE}`,
       runtime: Runtime.RUBY_3_2,
       code: Code.fromAsset('./', { exclude: exclude }),
       handler: 'newrelic_lambda_wrapper.handler',
@@ -130,7 +132,6 @@ export class NewrelicRubyLambdaDemoStack extends cdk.Stack {
     });
   }
 }
-
 
 const app = new cdk.App();
 new NewrelicRubyLambdaDemoStack(app, 'NewrelicRubyLambdaDemoStack', {

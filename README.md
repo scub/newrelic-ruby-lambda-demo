@@ -40,7 +40,7 @@ Deployment configuration can be found at [./build_resources/newrelic-ruby-lambda
 Once deployed, the lambdas can be invoked individually through the AWS console or using the cli:
 
 ```bash
-aws lambda invoke --function-name ruby-lambda-hello-world outfile && cat outfile | jq .
-aws lambda invoke --function-name ruby-lambda-modular-world outfile && cat outfile | jq .
-aws lambda invoke --function-name ruby-lambda-raise-exception outfile && cat outfile | jq .
+aws lambda invoke --function-name ruby-lambda-hello-world-test /dev/stdout | jq .
+aws lambda invoke --function-name ruby-lambda-modular-world-test /dev/stdout | jq .
+aws lambda invoke --function-name ruby-lambda-raise-exception-test /dev/stdout | jq .
 ```
