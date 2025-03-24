@@ -22,8 +22,10 @@ npm install
 The `NewrelicRubyLambdaDemoStack` stack includes two lambda layers, one containing the dependencies in [Gemfile](./Gemfile) and the other is the New Relic layer. It also includes three lambda functions:
 
 - `ruby-lambda-hello-world` ([app/handlers/hello_world](app/handlers/hello_world.rb)) - Simple example returns hello world
+- `ruby-lambda-new-hello-world` ([app/handlers/hello_world](app/handlers/updated_hello_world.rb)) - Simple example with uncaught exception in a class that returns hello world
 - `ruby-lambda-modular-world` ([app/handlers/modular_hello_world](app/handlers/modular_hello_world.rb)) - Same hello world but provided as a module
 - `ruby-lambda-raise-exception` ([app/handlers/raise_exception](app/handlers/raise_exception.rb)) - Raising an uncaught exception appears to cause requests to stick open until the lambda timeout. (we would like to be able to have these show up in errors inbox)
+- `ruby-lambda-newrelic-exception` ([app/handles/newrelic_provided_example](app/handlers/newrelic_provided_example.rb)) - Example raising an uncaught exception given an event payload or a handled exception on normal invocation
 
 ## Highlights
 
@@ -41,6 +43,9 @@ Once deployed, the lambdas can be invoked individually through the AWS console o
 
 ```bash
 aws lambda invoke --function-name ruby-lambda-hello-world-test /dev/stdout | jq .
+aws lambda invoke --function-name ruby-lambda-new-hello-world-test /dev/stdout | jq .
 aws lambda invoke --function-name ruby-lambda-modular-world-test /dev/stdout | jq .
 aws lambda invoke --function-name ruby-lambda-raise-exception-test /dev/stdout | jq .
+aws lambda invoke --function-name ruby-lambda-newrelic-exception-test /dev/stdout | jq .
+aws lambda invoke --invocation-type Event --payload '{"raise_error": true}' --cli-binary-format raw-in-base64-out --function-name ruby-lambda-newrelic-exception-test /dev/stdout | jq .
 ```

@@ -17,6 +17,7 @@ export class NewrelicRubyLambdaDemoStack extends cdk.Stack {
       'build_resources',
       'node_modules',
       'cdk.out',
+      'README.md',
     ]
 
     // Hardcoding
@@ -130,6 +131,37 @@ export class NewrelicRubyLambdaDemoStack extends cdk.Stack {
       retryAttempts: 0,
       timeout: Duration.seconds(30),
     });
+
+    // Using the example from New Relic support https://github.com/keegoid-nr/examples/tree/2457fdc5e885a73b02b777124368e26d6b44013a/lambda/sam/ruby/src/ruby33
+    new Function(this, 'RubyLambdaNewRelicExample', {
+      functionName: `ruby-lambda-newrelic-exception-${STAGE}`,
+      runtime: Runtime.RUBY_3_2,
+      code: Code.fromAsset('./', { exclude: exclude }),
+      handler: 'newrelic_lambda_wrapper.handler',
+      environment: {
+        NEW_RELIC_LAMBDA_HANDLER: 'app/handlers/newrelic_provided_example.App.handler',
+        ...environment
+      },
+      layers: [newrelicGemLayer, gemLayer],
+      retryAttempts: 0,
+      timeout: Duration.seconds(30),
+    });
+
+    // Bringing basic lambda function w/ custom gem path in line with New Relic support example
+    new Function(this, 'RubyLambdaNewHelloWorld', {
+      functionName: `ruby-lambda-new-hello-world-${STAGE}`,
+      runtime: Runtime.RUBY_3_2,
+      code: Code.fromAsset('./', { exclude: exclude }),
+      handler: 'newrelic_lambda_wrapper.handler',
+      environment: {
+        NEW_RELIC_LAMBDA_HANDLER: 'app/handlers/updated_hello_world.App.handler',
+        ...environment
+      },
+      layers: [newrelicGemLayer, gemLayer],
+      retryAttempts: 0,
+      timeout: Duration.seconds(30),
+    });
+
   }
 }
 
